@@ -1,0 +1,25 @@
+name: Test composite action
+
+on: [ push, pull_request ]
+
+jobs:
+  test-composite:
+    name: Test composite on Python${{ matrix.python-version }} PySide6 ${{ matrix.pyside6-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ windows-2019, windows-2022, windows-2025, windows-latest ]
+        python-version: [ "3.11" ]
+        pyside6-version: [ "6.6.0", "6.6.1", "6.6.2", "6.6.3", "6.7.2", "6.7.3", "6.8.0", "6.8.1", "6.8.2", "6.8.3" ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Run local composite action
+        uses: ./.github/actions/setup-pyside6-win7
+        with:
+          pyside6-version: ${{ matrix.pyside6-version }}
+      - name: Check PySide6 for Windows7 version
+        shell: bash
+        run: |
+          python -c "import PySide6; print(PySide6.__version__)"
