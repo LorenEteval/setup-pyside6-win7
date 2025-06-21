@@ -27,4 +27,5 @@ jobs:
       - name: Check PySide6 for Windows7 version
         shell: bash
         run: |
+          python -c "import sys; print(sys.version)"
           python -c "import PySide6; print(PySide6.__version__)"
