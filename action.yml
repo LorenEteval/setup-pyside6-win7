@@ -31,21 +31,21 @@ runs:
 
         pyside_arch="${{ inputs.architecture }}"
         pyside_name="qt6_${pyside_arch}_to_run_on_windows7"
+        pyside_file="${pyside_name}.7z"
 
         release_tag="${{ inputs.release-tag }}"
 
         if [ -z "$release_tag" ]; then
-          echo "Input release tag is empty. Use input PySide6 version"
+          echo "Input release tag is empty. Use input PySide6 version ${{ inputs.pyside6-version }}"
           release_tag="v${{ inputs.pyside6-version }}"
         fi
 
-        echo "Installing PySide6 Essentials version: ${{ inputs.pyside6-version }}"
         python -c "import sys; print(sys.version)"
         python -m pip install --upgrade pip
         python -m pip install setuptools wheel
         python -m pip install PySide6-Essentials==${{ inputs.pyside6-version }}
-        curl -L -o "${pyside_name}.7z" "https://github.com/${{ inputs.github-repo }}/releases/download/${release_tag}/${pyside_name}.7z"
-        7z x "${pyside_name}.7z" -o"${pyside_name}" -y
+        curl -L -o "${pyside_file}" "https://github.com/${{ inputs.github-repo }}/releases/download/${release_tag}/${pyside_file}"
+        7z x "${pyside_file}" -o"${pyside_name}" -y
         cd "${pyside_name}"
         mkdir plugins
         mv imageformats platforms styles plugins
