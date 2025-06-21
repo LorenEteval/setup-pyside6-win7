@@ -1,0 +1,55 @@
+name: "Setup PySide6 for Windows7 Action"
+description: "Set up GitHub Actions workflow with a specific version of PySide6 for Windows7"
+
+inputs:
+  pyside6-version:
+    description: "PySide6 version input, e.g. '6.8.3'"
+    required: true
+  architecture:
+    description: "PySide6 architecture, e.g. 'x86' or 'x64', default is 'x64'"
+    required: false
+    default: x64
+  github-repo:
+    description: "PySide6 for Windows7 Github repository"
+    required: false
+    default: crystalidea/qt6windows7
+  release-tag:
+    description: "Release tag for the github repo, default is v{{ inputs.pyside6-version }}"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup PySide6 for Windows7
+      shell: bash
+      run: |
+        python_path=$(which python)
+        echo "Python path is: $python_path"
+
+        python_home=$(dirname "$python_path")
+        echo "Python home is: $python_home"
+
+        pyside_arch=${{ inputs.architecture }}
+        pyside_name=qt6_$(pyside_arch)_to_run_on_windows7
+
+        release_tag=${{ inputs.release-tag }}
+
+        if [ "$release_tag" == "" ]; then
+          echo "Input release tag is empty. Use input PySide6 version"
+          release_tag="v${{ inputs.pyside6-version }}"
+        fi
+
+        python -c "import sys; print(sys.version)"
+        python -m pip install --upgrade pip
+        python -m pip install setuptools wheel
+        python -m pip install PySide6-Essentials==${{ inputs.pyside6-version }}
+        curl -L -o $(pyside_name).7z https://github.com/${{ inputs.github-repo }}/releases/download/$(release_tag)/$(pyside_name).7z
+        7z x $(pyside_name).7z -o$(pyside_name) -y
+        cd $(pyside_name)
+        mkdir plugins
+        mv imageformats platforms styles plugins
+        cd ..
+        cp -r $(pyside_name)/* "$(python_home)/Lib/site-packages/PySide6/"
+branding:
+  color: blue
+  icon: package
