@@ -9,6 +9,10 @@ inputs:
     description: "PySide6 architecture, e.g. 'x86' or 'x64', default is 'x64'"
     required: false
     default: x64
+  relative-lib-path:
+    description: "PySide6 relative library path, default is 'Lib/site-packages'"
+    required: false
+    default: Lib/site-packages
   github-repo:
     description: "PySide6 for Windows7 Github repository"
     required: false
@@ -50,7 +54,14 @@ runs:
         mkdir plugins
         mv imageformats platforms styles plugins
         cd ..
-        cp -r "${pyside_name}"/* "${python_home}/Lib/site-packages/PySide6/"
+
+        relative_lib_path="${{ inputs.relative-lib-path }}"
+        if [ -z "$relative_lib_path" ]; then
+          pyside_lib_destination="${python_home}/PySide6/"
+        else
+          pyside_lib_destination="${python_home}/${relative_lib_path}/PySide6/"
+        fi
+        cp -r "${pyside_name}"/* ${pyside_lib_destination}
 branding:
   color: blue
   icon: package
